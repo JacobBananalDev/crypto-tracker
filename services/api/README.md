@@ -66,3 +66,38 @@ Without venv:
 - Docker behavior differs from local
 
 This mirrors how production services isolate dependencies.
+
+# Install FastAPI + Uvicorn 
+```bash
+pip install fastapi uvicorn
+```
+Now freeze the dependencies:
+will copy over into requirements.txt
+```bash
+pip freeze > requirements.txt
+```
+
+Open requirements.txt:
+```bash
+fastapi
+uvicorn
+pydantic
+starlette
+```
+
+
+# Run the Server
+From inside services/api
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Important breakdown:
+```bash
+app.main:app
+│   │     │
+│   │     └── the variable named "app"
+│   └──────── the file main.py
+└──────────── the package folder
+```
