@@ -15,6 +15,7 @@ Why?
 
 from fastapi import FastAPI
 from app.api.v1.routes.health import router as health_router
+from app.core.config import settings as cypto_api_settings
 
 def create_app() -> FastAPI:
     """
@@ -27,8 +28,8 @@ def create_app() -> FastAPI:
     This allows more flexibility later in terms of testing and configuration
     """
     app = FastAPI(
-        title="Crypto Tracker API",
-        version="1.0.0",
+        title=cypto_api_settings.APP_NAME,
+        version=cypto_api_settings.APP_VERSION,
         description="Backend-first cryptocurrency tracking API built with FastAPI"
     )
     
