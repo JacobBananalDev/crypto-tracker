@@ -14,6 +14,7 @@ Why?
 """
 
 from fastapi import FastAPI
+from app.api.v1.routes.health import router as health_router
 
 def create_app() -> FastAPI:
     """
@@ -31,10 +32,12 @@ def create_app() -> FastAPI:
         description="Backend-first cryptocurrency tracking API built with FastAPI"
     )
     
-    # TODO
     # we will include routers here later.
     # example:
     # app.include_router(coin_router, prefix="/api/v1"
+    
+    # Register versioned API routes
+    app.include_router(health_router, prefix="/api/v1")
     
     return app
 
