@@ -36,3 +36,33 @@ from app.main import app
 ```
 
 Without it, Python wouldn’t treat app/ as a module.
+
+
+>
+# 🧠 Why Virtual Environments?
+
+```bash
+cd services\api
+python -m venv .venv
+```
+
+```bash
+.\.venv\Scripts\Activate
+```
+
+You should now see:
+```bash
+(.venv) PS C:\Github\crypto-tracker\services\api>
+```
+
+Each Python project should isolate its dependencies.
+
+Without venv:
+
+- You pollute global Python
+
+- Version conflicts happen
+
+- Docker behavior differs from local
+
+This mirrors how production services isolate dependencies.
