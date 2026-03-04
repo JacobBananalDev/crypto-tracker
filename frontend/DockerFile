@@ -1,28 +1,36 @@
 # ------------------------------------------------------------
 # Frontend Dockerfile
 #
-# This container builds and runs the Next.js application.
+# Builds and runs the Next.js frontend application.
+#
+# This container will be used for production deployment
+# in container environments such as:
+#
+# - AWS ECS
+# - Kubernetes
+# - Docker Compose
+#
 # ------------------------------------------------------------
 
-# Use Node runtime
+# Use Node.js runtime
 FROM node:20
 
-# Set working directory
+# Set working directory inside container
 WORKDIR /app
 
-# Copy dependency files
-COPY package*.json ./
+# Copy dependency files first (better Docker layer caching)
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy project files
+# Copy application source code
 COPY . .
 
-# Build Next.js app
+# Build Next.js application
 RUN npm run build
 
-# Expose frontend port
+# Expose the Next.js production port
 EXPOSE 3000
 
 # Start production server
