@@ -14,7 +14,8 @@ from app.core.db import get_db
 from app.schemas.coin import CoinCreate, CoinResponse
 from app.crud.coin import create_coin, get_coins, get_coin_by_symbol
 from app.services.coingecko import fetch_coin_price
-from app.crud.coin_price import create_coin_price
+from app.schemas.coin_price import CoinPriceResponse
+from app.crud.coin_price import create_coin_price, get_latest_price, get_price_history
 
 router = APIRouter(prefix="/coins", tags=["Coins"])
 
@@ -98,3 +99,40 @@ def fetch_and_store_price(
     )
 
     return price
+
+@router.get("/{symbol}/price", response_model=CoinPriceResponse)
+def get_coin_price(
+    symbol: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieve the latest stored price for a coin.
+    """
+
+    coin = get_coin_by_symbol(db, symbol.upper())
+
+    if not coin:
+        raise HTTPException(status_code=404, detail="Coin not found")
+
+    price = get_latest_price(db, coin.id)
+
+    if not price:
+        raise HTTPException(status_code=404, detail="No price data available")
+
+    return price
+
+@router.get("/{symbol}/history", response_model=list[CoinPriceResponse])
+def get_coin_price_history(
+    symbol: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieve historical prices for a coin.
+    """
+
+    coin = get_coin_by_symbol(db, symbol.upper())
+
+    if not coin:
+        raise HTTPException(status_code=404, detail="Coin not found")
+
+    return get_price_history(db, coin.id)

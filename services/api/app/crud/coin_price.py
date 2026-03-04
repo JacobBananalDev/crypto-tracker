@@ -31,3 +31,27 @@ def create_coin_price(
     db.refresh(price)
 
     return price
+
+def get_latest_price(db, coin_id: int):
+    """
+    Retrieve the most recent price for a coin.
+    """
+
+    return (
+        db.query(CoinPrice)
+        .filter(CoinPrice.coin_id == coin_id)
+        .order_by(CoinPrice.timestamp.desc())
+        .first()
+    )
+    
+def get_price_history(db, coin_id: int):
+    """
+    Retrieve all stored price snapshots for a coin.
+    """
+
+    return (
+        db.query(CoinPrice)
+        .filter(CoinPrice.coin_id == coin_id)
+        .order_by(CoinPrice.timestamp.desc())
+        .all()
+    )
