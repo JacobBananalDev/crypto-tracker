@@ -32,8 +32,13 @@ def update_prices():
 
             coin_ids = [coin.name.lower() for coin in coins]
 
-            price_data = fetch_prices_batch(coin_ids)
-
+            try:
+                price_data = fetch_prices_batch(coin_ids)
+            except Exception as e:
+                print(f"[PRICE WORKER] Error: {e}")
+                time.sleep(60)
+                continue
+            
             for coin in coins:
 
                 data = price_data.get(coin.name.lower())
@@ -54,5 +59,5 @@ def update_prices():
         finally:
             db.close()
 
-        # Wait 60 seconds before next update
-        time.sleep(60)
+        # Wait 120 seconds before next update
+        time.sleep(120)

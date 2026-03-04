@@ -55,3 +55,16 @@ def get_price_history(db, coin_id: int):
         .order_by(CoinPrice.timestamp.desc())
         .all()
     )
+    
+def get_price_chart(db, coin_id: int, limit: int = 100):
+    """
+    Retrieve price points for chart display.
+    """
+
+    return (
+        db.query(CoinPrice)
+        .filter(CoinPrice.coin_id == coin_id)
+        .order_by(CoinPrice.timestamp.desc())
+        .limit(limit)
+        .all()
+    )

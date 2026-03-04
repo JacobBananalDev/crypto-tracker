@@ -36,12 +36,6 @@ def fetch_coin_price(coin_id: str):
     return data.get(coin_id)
 
 def fetch_prices_batch(coin_ids: list[str]):
-    """
-    Fetch prices for multiple coins in one request.
-
-    Example:
-    ["bitcoin", "ethereum", "solana"]
-    """
 
     ids = ",".join(coin_ids)
 
@@ -54,7 +48,18 @@ def fetch_prices_batch(coin_ids: list[str]):
         "include_24hr_vol": "true"
     }
 
-    response = requests.get(url, params=params)
-    response.raise_for_status()
+    for attempt in range(3):
 
-    return response.json()
+        response = requests.get(url, params=params)
+
+        if response.status_code == 429:
+            print("[COINGECKO] Rate limited. Sleeping 30s...")
+            time.sleep(30)
+            continue
+
+        response.raise_for_status()
+
+        return response.json()
+
+    print("[COINGECKO] Failed after retries")
+    return {}

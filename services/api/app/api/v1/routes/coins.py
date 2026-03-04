@@ -15,7 +15,8 @@ from app.schemas.coin import CoinCreate, CoinResponse
 from app.crud.coin import create_coin, get_coins, get_coin_by_symbol
 from app.services.coingecko import fetch_coin_price
 from app.schemas.coin_price import CoinPriceResponse
-from app.crud.coin_price import create_coin_price, get_latest_price, get_price_history
+from app.crud.coin_price import create_coin_price, get_latest_price, get_price_history, get_price_chart
+from app.schemas.chart import PricePoint
 
 router = APIRouter(prefix="/coins", tags=["Coins"])
 
@@ -136,3 +137,29 @@ def get_coin_price_history(
         raise HTTPException(status_code=404, detail="Coin not found")
 
     return get_price_history(db, coin.id)
+
+@router.get("/{symbol}/chart", response_model=list[PricePoint])
+def get_coin_chart(
+    symbol: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Return chart-ready price data for a coin.
+    """
+
+    coin = get_coin_by_symbol(db, symbol.upper())
+
+    if not coin:
+        raise HTTPException(status_code=404, detail="Coin not found")
+
+    prices = get_price_chart(db, coin.id)
+
+    chart = []
+
+    for p in prices:
+        chart.append({
+            "time": p.timestamp.strftime("%H:%M"),
+            "price": p.price_usd
+        })
+
+    return chart
