@@ -11,7 +11,7 @@
 
 import { useEffect, useState } from "react"
 import { getCoins } from "@/lib/api"
-import Image from "next/image"
+import Link from "next/link"
 
 interface Coin {
   id: number
@@ -78,9 +78,10 @@ export default function CoinsPage() {
 
         {coins.map((coin) => (
 
-          <div
+          <Link
+            href={`/coins/${coin.symbol}`}
             key={coin.id}
-            className="flex items-center justify-between p-4 border-b"
+            className="flex items-center justify-between p-4 border-b hover:bg-gray-100"
           >
 
             <div className="flex items-center gap-4">
@@ -105,7 +106,7 @@ export default function CoinsPage() {
 
             </div>
 
-          </div>
+          </Link>
 
         ))}
 
