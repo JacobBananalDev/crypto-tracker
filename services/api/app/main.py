@@ -15,6 +15,7 @@ Why?
 
 from fastapi import FastAPI
 from app.api.v1.routes.health import router as health_router
+from app.api.v1.routes.coins import router as coins_router
 from app.core.config import settings as cypto_api_settings
 
 def create_app() -> FastAPI:
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
     
     # Register versioned API routes
     app.include_router(health_router, prefix="/api/v1")
+    app.include_router(coins_router, prefix="/api/v1")
     
     return app
 
