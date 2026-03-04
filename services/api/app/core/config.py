@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # Database (we will use this later)
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/crypto_db"
+    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/crypto_db"
 
     class Config:
         # This allows us to use a .env file later

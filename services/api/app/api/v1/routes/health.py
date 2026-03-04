@@ -9,7 +9,11 @@ Health checks are important in real systems for:
 - Monitoring systems
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+
+from app.core.db import get_db
 
 # APIRouter allows us to group related endpoints
 router = APIRouter()
@@ -23,3 +27,14 @@ def health_check():
     Returns 200 if the service is running.
     """
     return {"status": "ok"}
+
+@router.get("/health/db", tags=["Health"])
+def db_health_check(db: Session = Depends(get_db)):
+    """
+    Database health check.
+
+    Executes a trivial SQL query to verify the
+    database connection works.
+    """
+    db.execute(text("SELECT 1"))
+    return {"database": "connected"}
