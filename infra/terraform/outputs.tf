@@ -1,13 +1,9 @@
 # ------------------------------------------------------------
-# Variables used throughout the infrastructure
+# Terraform outputs
 # ------------------------------------------------------------
 
-variable "aws_region" {
-  description = "AWS region to deploy resources"
-  default     = "us-east-1"
-}
+output "ecs_cluster_name" {
 
-variable "project_name" {
-  description = "Project name prefix"
-  default     = "crypto-tracker"
+  value = aws_ecs_cluster.crypto_cluster.name
+
 }
