@@ -13,6 +13,7 @@
 import { useEffect, useState } from "react";
 import { getPortfolioValue, getCoinChart } from "@/lib/api";
 import PriceChart from "@/components/charts/PriceChart";
+import AllocationChart from "@/components/charts/AllocationChart";
 
 interface Asset {
   symbol: string;
@@ -103,6 +104,8 @@ export default function HomePage() {
           </div>
         </div>
       )}
+
+      {portfolio && <AllocationChart assets={portfolio.assets} />}
 
       <div className="flex gap-4 mb-4">
         {["BTC", "SOL", "XRP"].map((coin) => (
