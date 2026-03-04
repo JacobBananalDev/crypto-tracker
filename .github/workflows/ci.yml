@@ -112,3 +112,31 @@ jobs:
       # If the build fails, the CI pipeline fails
       - name: Build Next.js application
         run: npm run build
+
+  # ------------------------------------------------------------
+  # Docker Build Job
+  #
+  # This job verifies that Docker images for both the backend
+  # and frontend can successfully build.
+  #
+  # This is critical for container-based deployments.
+  # ------------------------------------------------------------
+  docker:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Build backend Docker image
+      - name: Build backend Docker image
+        run: |
+          docker build -t crypto-tracker-api ./services/api
+
+      # Build frontend Docker image
+      - name: Build frontend Docker image
+        run: |
+          docker build -t crypto-tracker-frontend ./frontend
