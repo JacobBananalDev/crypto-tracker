@@ -49,3 +49,22 @@ export async function getCoins() {
 
   return res.json()
 }
+
+/**
+ * Fetch chart-ready price data for a given coin symbol.
+ *
+ * Endpoint:
+ * GET /api/v1/coins/{symbol}/chart
+ *
+ * Example:
+ * getCoinChart("BTC")
+ */
+export async function getCoinChart(symbol: string) {
+  const res = await fetch(`${API_BASE}/coins/${symbol}/chart`)
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch chart data for ${symbol}`)
+  }
+
+  return res.json()
+}
