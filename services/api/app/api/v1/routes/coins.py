@@ -13,7 +13,8 @@ from sqlalchemy.orm import Session
 from app.core.db import get_db
 from app.schemas.coin import CoinCreate, CoinResponse
 from app.crud.coin import create_coin, get_coins, get_coin_by_symbol
-
+from app.services.coingecko import fetch_coin_price
+from app.crud.coin_price import create_coin_price
 
 router = APIRouter(prefix="/coins", tags=["Coins"])
 
@@ -68,3 +69,32 @@ def get_coin(
         )
 
     return coin
+
+@router.post("/{symbol}/price")
+def fetch_and_store_price(
+    symbol: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Fetch latest price from CoinGecko and store it.
+    """
+
+    coin = get_coin_by_symbol(db, symbol.upper())
+
+    if not coin:
+        raise HTTPException(status_code=404, detail="Coin not found")
+
+    price_data = fetch_coin_price(coin.name.lower())
+
+    if not price_data:
+        raise HTTPException(status_code=400, detail="Price data not found")
+
+    price = create_coin_price(
+        db,
+        coin_id=coin.id,
+        price_usd=price_data["usd"],
+        market_cap=price_data.get("usd_market_cap"),
+        volume_24h=price_data.get("usd_24h_vol")
+    )
+
+    return price
