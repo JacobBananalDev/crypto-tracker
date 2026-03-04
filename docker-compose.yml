@@ -1,0 +1,47 @@
+# docker-compose.yml
+#
+# Docker Compose allows us to define and run multi-container applications.
+# For now we are only running a PostgreSQL database container.
+#
+# Later we will add:
+# - FastAPI service
+# - possibly Redis or worker services
+
+version: "3.9"
+
+services:
+
+  # PostgreSQL database service
+  postgres:
+    # Official PostgreSQL Docker image
+    image: postgres:16
+
+    # Name of the running container (easier to identify in docker ps)
+    container_name: crypto-tracker-postgres
+
+    # Environment variables used by the Postgres image
+    # These automatically configure the database on first startup
+    environment:
+      POSTGRES_USER: postgres          # Database username
+      POSTGRES_PASSWORD: postgres      # Database password
+      POSTGRES_DB: crypto_db           # Database name created at startup
+
+    # Expose the database port to the host machine
+    # Format: HOST_PORT:CONTAINER_PORT
+    #
+    # This allows our local FastAPI app to connect to the database
+    # using localhost:5432
+    ports:
+      - "5432:5432"
+
+    # Persist database data on the host machine
+    #
+    # Without this, all data would be lost if the container stops.
+    # Docker will create a named volume called "postgres_data".
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# Named volumes managed by Docker
+# These survive container restarts
+volumes:
+  postgres_data:
