@@ -12,11 +12,31 @@ Why?
 - Scales better in real projects
 
 """
-
+import threading
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.api.v1.routes.health import router as health_router
 from app.api.v1.routes.coins import router as coins_router
 from app.core.config import settings as cypto_api_settings
+from app.services.price_updater import update_prices
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifecycle handler for the FastAPI app.
+
+    Runs once when the server starts and once when it shuts down.
+    """
+
+    # Start background price worker
+    thread = threading.Thread(target=update_prices, daemon=True)
+    thread.start()
+
+    print("[PRICE WORKER] Started")
+
+    yield
+
+    print("[SERVER] Shutdown")
 
 def create_app() -> FastAPI:
     """
@@ -31,8 +51,10 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=cypto_api_settings.APP_NAME,
         version=cypto_api_settings.APP_VERSION,
-        description="Backend-first cryptocurrency tracking API built with FastAPI"
+        description="Backend-first cryptocurrency tracking API built with FastAPI",
+        lifespan=lifespan
     )
+    
     
     # we will include routers here later.
     # example:
@@ -44,5 +66,8 @@ def create_app() -> FastAPI:
     
     return app
 
+
+
 # This is the ASGI application that Uvicorn will run
 app = create_app()
+
