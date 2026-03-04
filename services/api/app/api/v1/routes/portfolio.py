@@ -18,6 +18,7 @@ from app.core.db import get_db
 from app.schemas.portfolio import PortfolioCreate
 from app.crud.portfolio import create_portfolio_entry, get_portfolio
 from app.crud.coin import get_coin_by_symbol
+from app.services.portfolio_value import calculate_portfolio_value
 
 
 router = APIRouter(
@@ -85,3 +86,16 @@ def get_portfolio_holdings(
     """
 
     return get_portfolio(db)
+
+@router.get("/value")
+def get_portfolio_value(
+    db: Session = Depends(get_db)
+):
+    """
+    Calculate the current USD value of the portfolio.
+
+    Uses the most recent price stored in the database
+    for each asset.
+    """
+
+    return calculate_portfolio_value(db)
