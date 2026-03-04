@@ -1,0 +1,114 @@
+# ------------------------------------------------------------
+# GitHub Actions CI Pipeline
+#
+# This workflow automatically runs checks for both the
+# FastAPI backend and the Next.js frontend whenever code
+# is pushed to the repository or a pull request is opened.
+#
+# Purpose:
+# - Catch broken imports
+# - Ensure backend dependencies install correctly
+# - Ensure the Next.js frontend builds successfully
+#
+# In a real production system this pipeline would later
+# also run:
+# - unit tests
+# - Docker builds
+# - deployments to AWS
+# ------------------------------------------------------------
+
+name: Crypto Tracker CI
+
+# ------------------------------------------------------------
+# When should this workflow run?
+#
+# We trigger the pipeline on:
+# 1) pushes to the main branch
+# 2) pull requests targeting main
+# ------------------------------------------------------------
+on:
+  push:
+    branches: [ Master, main ]
+
+  pull_request:
+    branches: [ Master, main ]
+
+jobs:
+
+  # ------------------------------------------------------------
+  # Backend Job
+  #
+  # This job validates the FastAPI backend.
+  # It installs Python dependencies and verifies that the
+  # application can be imported successfully.
+  #
+  # If imports fail, the pipeline will fail.
+  # ------------------------------------------------------------
+  backend:
+
+    runs-on: ubuntu-latest
+
+    # Set default working directory for backend commands
+    defaults:
+      run:
+        working-directory: services/api
+
+    steps:
+
+      # Pull the repository code into the GitHub runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Python runtime
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Install FastAPI backend dependencies
+      - name: Install backend dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Verify the FastAPI app loads correctly
+      # This catches syntax errors or bad imports early
+      - name: Verify FastAPI application imports
+        run: |
+          python -c "from app.main import app"
+
+  # ------------------------------------------------------------
+  # Frontend Job
+  #
+  # This job validates the Next.js frontend application.
+  # It ensures the project installs correctly and builds
+  # without TypeScript or compilation errors.
+  # ------------------------------------------------------------
+  frontend:
+
+    runs-on: ubuntu-latest
+
+    # Run commands from the frontend directory
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+
+      # Pull the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install Node runtime
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Install frontend dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the Next.js application
+      # If the build fails, the CI pipeline fails
+      - name: Build Next.js application
+        run: npm run build
