@@ -15,6 +15,7 @@ Why?
 import threading
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.routes.health import router as health_router
 from app.api.v1.routes.coins import router as coins_router
 from app.api.v1.routes.portfolio import router as portfolio_router
@@ -56,6 +57,16 @@ def create_app() -> FastAPI:
         lifespan=lifespan
     )
     
+     # Enable CORS so the Next.js frontend can call the API
+    app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
     
     # we will include routers here later.
     # example:
