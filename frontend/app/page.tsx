@@ -32,6 +32,7 @@ export default function HomePage() {
   const [btcChart, setBtcChart] = useState<{ time: string; price: number }[]>(
     []
   );
+  const [selectedCoin, setSelectedCoin] = useState("BTC");
 
   /**
    * Fetch portfolio value when the page loads.
@@ -40,8 +41,6 @@ export default function HomePage() {
     async function fetchPortfolio() {
       try {
         const data = await getPortfolioValue();
-        const chart = await getCoinChart("BTC");
-        setBtcChart(chart);
         setPortfolio(data);
       } catch (error) {
         console.error("Failed to load portfolio", error);
@@ -52,6 +51,24 @@ export default function HomePage() {
 
     fetchPortfolio();
   }, []);
+
+  /**
+   * Fetch chart data whenever the selected coin changes
+   */
+
+  useEffect(() => {
+    async function fetchChart() {
+      try {
+        const chart = await getCoinChart(selectedCoin);
+
+        setBtcChart(chart);
+      } catch (error) {
+        console.error("Failed to load chart", error);
+      }
+    }
+
+    fetchChart();
+  }, [selectedCoin]);
 
   if (loading) {
     return <div className="p-10 text-lg">Loading portfolio...</div>;
@@ -87,9 +104,25 @@ export default function HomePage() {
         </div>
       )}
 
+      <div className="flex gap-4 mb-4">
+        {["BTC", "SOL", "XRP"].map((coin) => (
+          <button
+            key={coin}
+            onClick={() => setSelectedCoin(coin)}
+            className={`px-4 py-2 rounded-lg ${
+              selectedCoin === coin
+                ? "bg-blue-500 text-white"
+                : "bg-gray-800 text-gray-300"
+            }`}
+          >
+            {coin}
+          </button>
+        ))}
+      </div>
+
       {/* BTC Price Chart */}
       {btcChart.length > 0 && (
-        <PriceChart title="BTC Price History" data={btcChart} />
+        <PriceChart title={`${selectedCoin} Price History`} data={btcChart} />
       )}
     </main>
   );
