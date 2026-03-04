@@ -154,7 +154,7 @@ jobs:
             packages: write
         
         env:
-            REGISTRY: ghrc.io
+            REGISTRY: ghcr.io
             OWNER: jacobbananaldev # must be lowercase
 
         steps:
