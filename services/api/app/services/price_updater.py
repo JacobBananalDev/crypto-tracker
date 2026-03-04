@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.db import SessionLocal
 from app.crud.coin import get_coins
 from app.crud.coin_price import create_coin_price
-from app.services.coingecko import fetch_coin_price
+from app.services.coingecko import fetch_prices_batch
 
 
 def update_prices():
@@ -21,28 +21,35 @@ def update_prices():
 
     while True:
 
-        db: Session = SessionLocal()
+        db = SessionLocal()
 
         try:
 
             coins = get_coins(db)
 
+            if not coins:
+                continue
+
+            coin_ids = [coin.name.lower() for coin in coins]
+
+            price_data = fetch_prices_batch(coin_ids)
+
             for coin in coins:
 
-                price_data = fetch_coin_price(coin.name.lower())
+                data = price_data.get(coin.name.lower())
 
-                if not price_data:
+                if not data:
                     continue
 
                 create_coin_price(
                     db,
                     coin_id=coin.id,
-                    price_usd=price_data["usd"],
-                    market_cap=price_data.get("usd_market_cap"),
-                    volume_24h=price_data.get("usd_24h_vol")
+                    price_usd=data["usd"],
+                    market_cap=data.get("usd_market_cap"),
+                    volume_24h=data.get("usd_24h_vol")
                 )
 
-                print(f"Updated price for {coin.symbol}")
+                print(f"[PRICE WORKER] Updated {coin.symbol}")
 
         finally:
             db.close()
